@@ -7,7 +7,9 @@ import adminRouter from "./routes/admin";
 
 const app: Express = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
+
+// app.use(bodyParser.json());
 
 app.use(shopRouter);
 app.use(adminRouter);

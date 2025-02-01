@@ -4,6 +4,10 @@ exports.getProductsController = exports.getProductController = void 0;
 const dummyData_1 = require("../data/dummyData");
 const getProductController = (req, res, next) => {
     const param = req.params;
+    if (!param.prodId) {
+        res.status(400).json({ message: "Bad Reqeust: Request param is required" });
+        return;
+    }
     const prodId = param.prodId;
     const product = dummyData_1.products.find((prod) => prod.id === prodId);
     res

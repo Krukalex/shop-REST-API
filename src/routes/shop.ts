@@ -6,8 +6,8 @@ import {
 
 const shopRouter = Router();
 
-shopRouter.get("/products/:prodId", getProductController);
-
 shopRouter.get("/", getProductsController);
+
+shopRouter.get("/products/:prodId", getProductController);
 
 export default shopRouter;

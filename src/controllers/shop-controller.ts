@@ -7,6 +7,10 @@ interface GetProductParam {
 
 export const getProductController = (req: any, res: any, next: any) => {
   const param: GetProductParam = req.params;
+  if (!param.prodId) {
+    res.status(400).json({ message: "Bad Reqeust: Request param is required" });
+    return;
+  }
   const prodId = param.prodId;
   const product: Product | undefined = products.find(
     (prod: Product) => prod.id === prodId
