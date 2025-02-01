@@ -1,5 +1,6 @@
 import { products } from "../data/dummyData";
 import Product from "../models/Product";
+import jwt from "jsonwebtoken";
 
 interface GetProductParam {
   prodId: string;
@@ -15,6 +16,11 @@ export const getProductController = (req: any, res: any, next: any) => {
   const product: Product | undefined = products.find(
     (prod: Product) => prod.id === prodId
   );
+  if (!product) {
+    const error = new Error("The requested product could not be found") as any;
+    error.status = 404;
+    throw error;
+  }
   res
     .status(200)
     .json({ message: `Retrieved product ${prodId}`, product: product });

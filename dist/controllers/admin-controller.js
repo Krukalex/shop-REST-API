@@ -22,8 +22,9 @@ exports.getProductController = getProductController;
 const createProductController = (req, res, next) => {
     const body = req.body;
     if (!body.title || !body.description || body.price == null) {
-        res.status(400).json({ message: "Missing required product fields" });
-        return;
+        const error = new Error("Missing required product fields");
+        error.status = 400;
+        throw error;
     }
     const { title, description, price } = body;
     const newProduct = new Product_1.default(title, description, price);
@@ -37,12 +38,14 @@ const updateProductController = (req, res, next) => {
     const param = req.params;
     const body = req.body;
     if (!body) {
-        res.status(400).json({ message: "Bad Reqeust: Request body is required" });
-        return;
+        const error = new Error("Bad Request: Request body is required");
+        error.status = 400;
+        throw error;
     }
     if (!param.prodId) {
-        res.status(400).json({ message: "Bad Reqeust: Request param is required" });
-        return;
+        const error = new Error("Bad Request: Request params is required");
+        error.status = 400;
+        throw error;
     }
     const prodId = param.prodId;
     const prodIndex = dummyData_1.products.findIndex((prod) => prod.id === prodId);
@@ -66,8 +69,9 @@ exports.updateProductController = updateProductController;
 const deleteProductController = (req, res, next) => {
     const param = req.params;
     if (!param.prodId) {
-        res.status(400).json({ message: "Bad Reqeust: Request param is required" });
-        return;
+        const error = new Error("Missing required fields in request");
+        error.status = 400;
+        throw error;
     }
     const prodId = param.prodId;
     const index = dummyData_1.products.findIndex((prod) => prod.id === prodId);

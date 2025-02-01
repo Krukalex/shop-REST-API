@@ -9,10 +9,6 @@ interface PostProductBody {
   price: number;
 }
 
-interface ProductParam {
-  prodId: string;
-}
-
 interface UpdateProductBody {
   title?: string;
   description?: string;
@@ -20,7 +16,7 @@ interface UpdateProductBody {
 }
 
 export const getProductController = (req: any, res: any, next: any) => {
-  const param: ProductParam = req.params;
+  const param = req.params;
   if (!param.prodId) {
     res.status(400).json({ message: "Bad Reqeust: Request param is required" });
     return;
@@ -41,8 +37,9 @@ export const createProductController = (
 ) => {
   const body: PostProductBody = req.body;
   if (!body.title || !body.description || body.price == null) {
-    res.status(400).json({ message: "Missing required product fields" });
-    return;
+    const error = new Error("Missing required product fields") as any;
+    error.status = 400;
+    throw error;
   }
   const { title, description, price } = body;
   const newProduct = new Product(title, description, price);
@@ -53,19 +50,21 @@ export const createProductController = (
 };
 
 export const updateProductController = (
-  req: Request<ProductParam>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const param: ProductParam = req.params;
+  const param = req.params;
   const body: UpdateProductBody = req.body;
   if (!body) {
-    res.status(400).json({ message: "Bad Reqeust: Request body is required" });
-    return;
+    const error = new Error("Bad Request: Request body is required") as any;
+    error.status = 400;
+    throw error;
   }
   if (!param.prodId) {
-    res.status(400).json({ message: "Bad Reqeust: Request param is required" });
-    return;
+    const error = new Error("Bad Request: Request params is required") as any;
+    error.status = 400;
+    throw error;
   }
   const prodId = param.prodId;
   const prodIndex: number = products.findIndex((prod) => prod.id === prodId);
@@ -87,14 +86,15 @@ export const updateProductController = (
 };
 
 export const deleteProductController = (
-  req: Request<ProductParam>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const param: ProductParam = req.params;
+  const param = req.params;
   if (!param.prodId) {
-    res.status(400).json({ message: "Bad Reqeust: Request param is required" });
-    return;
+    const error = new Error("Missing required fields in request") as any;
+    error.status = 400;
+    throw error;
   }
   const prodId = param.prodId;
   const index = products.findIndex((prod) => prod.id === prodId);

@@ -4,13 +4,14 @@ import {
   deleteProductController,
   updateProductController,
 } from "../controllers/admin-controller";
+import { isAuth } from "../middleware/isAuth";
 
 const adminRouter = Router();
 
-adminRouter.post("/products", createProductController);
+adminRouter.post("/products", isAuth, createProductController);
 
-adminRouter.put("/products/:prodId", updateProductController);
+adminRouter.put("/products/:prodId", isAuth, updateProductController);
 
-adminRouter.delete("/products/:prodId", deleteProductController);
+adminRouter.delete("/products/:prodId", isAuth, deleteProductController);
 
 export default adminRouter;

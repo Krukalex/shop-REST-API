@@ -3,11 +3,12 @@ import {
   getProductController,
   getProductsController,
 } from "../controllers/shop-controller";
+import { isAuth } from "../middleware/isAuth";
 
 const shopRouter = Router();
 
-shopRouter.get("/", getProductsController);
+shopRouter.get("/", isAuth, getProductsController);
 
-shopRouter.get("/products/:prodId", getProductController);
+shopRouter.get("/products/:prodId", isAuth, getProductController);
 
 export default shopRouter;

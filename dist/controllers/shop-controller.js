@@ -10,6 +10,11 @@ const getProductController = (req, res, next) => {
     }
     const prodId = param.prodId;
     const product = dummyData_1.products.find((prod) => prod.id === prodId);
+    if (!product) {
+        const error = new Error("The requested product could not be found");
+        error.status = 404;
+        throw error;
+    }
     res
         .status(200)
         .json({ message: `Retrieved product ${prodId}`, product: product });
