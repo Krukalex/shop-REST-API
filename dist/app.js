@@ -13,4 +13,10 @@ app.use(express_1.default.json());
 app.use(shop_1.default);
 app.use(admin_1.default);
 app.use("/auth", auth_1.default);
+app.use((error, req, res, next) => {
+    console.log(error);
+    const status = error.status || 500;
+    const message = error.message;
+    res.status(status).json({ message: message });
+});
 app.listen(3000);

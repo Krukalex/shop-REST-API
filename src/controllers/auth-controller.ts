@@ -24,8 +24,9 @@ export const signupController = async (
 ) => {
   const body: SignupBody = req.body;
   if (!body.email && !body.name && !body.password) {
-    res.status(400).json({ message: "Missing required product fields" });
-    return;
+    const error = new Error("Missing required fields in request") as any;
+    error.status = 400;
+    return error;
   }
   try {
     const { name, email, password } = body;
@@ -33,8 +34,11 @@ export const signupController = async (
     const user = new User(name, email, hashedPassword);
     users.push(user);
     res.status(200).json({ message: "User created", userId: user.id });
-  } catch (err) {
-    console.log(err);
+  } catch (err: any) {
+    if (!err.status) {
+      err.status = 500;
+    }
+    next(err);
   }
 };
 
@@ -49,25 +53,34 @@ export const loginController = async (
     error.status = 400;
     return error;
   }
-  const { email, password } = body;
-  const user: User | undefined = users.find((user) => user.email === email);
-  if (!user) {
-    const error = new Error("A user with this email could not be found") as any;
-    error.status = 404;
-    throw error;
-  }
-  const isEqual = await bcrypt.compare(password, user.password);
-  if (!isEqual) {
-    const error = new Error("Wrong password!") as any;
-    error.status = 401;
-    throw error;
-  }
-  const token = jwt.sign(
-    { email: user.email, userId: user.id },
-    "supersecretkey",
-    {
-      expiresIn: "1h",
+  try {
+    const { email, password } = body;
+    const user: User | undefined = users.find((user) => user.email === email);
+    if (!user) {
+      const error = new Error(
+        "A user with this email could not be found"
+      ) as any;
+      error.status = 404;
+      throw error;
     }
-  );
-  res.status(200).json({ token: token, userId: user.id });
+    const isEqual = await bcrypt.compare(password, user.password);
+    if (!isEqual) {
+      const error = new Error("Wrong password!") as any;
+      error.status = 401;
+      throw error;
+    }
+    const token = jwt.sign(
+      { email: user.email, userId: user.id },
+      "supersecretkey",
+      {
+        expiresIn: "1h",
+      }
+    );
+    res.status(200).json({ token: token, userId: user.id });
+  } catch (err: any) {
+    if (!err.status) {
+      err.status = 500;
+    }
+    next(err);
+  }
 };

@@ -13,22 +13,40 @@ export const getProductController = (req: any, res: any, next: any) => {
     return;
   }
   const prodId = param.prodId;
-  const product: Product | undefined = products.find(
-    (prod: Product) => prod.id === prodId
-  );
-  if (!product) {
-    const error = new Error("The requested product could not be found") as any;
-    error.status = 404;
-    throw error;
+  try {
+    const product: Product | undefined = products.find(
+      (prod: Product) => prod.id === prodId
+    );
+    if (!product) {
+      const error = new Error(
+        "The requested product could not be found"
+      ) as any;
+      error.status = 404;
+      throw error;
+    }
+    res
+      .status(200)
+      .json({ message: `Retrieved product ${prodId}`, product: product });
+  } catch (err: any) {
+    if (!err.status) {
+      err.status = 500;
+    }
+    next(err);
   }
-  res
-    .status(200)
-    .json({ message: `Retrieved product ${prodId}`, product: product });
 };
 
 export const getProductsController = (req: any, res: any, next: any) => {
-  const productNames = products.map((product) => {
-    return { id: product.id, title: product.title };
-  });
-  res.status(200).json({ message: "Pulled all items", products: productNames });
+  try {
+    const productNames = products.map((product) => {
+      return { id: product.id, title: product.title };
+    });
+    res
+      .status(200)
+      .json({ message: "Pulled all items", products: productNames });
+  } catch (err: any) {
+    if (!err.status) {
+      err.status = 500;
+    }
+    next(err);
+  }
 };

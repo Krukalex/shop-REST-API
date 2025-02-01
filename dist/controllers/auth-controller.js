@@ -20,8 +20,9 @@ const User_1 = __importDefault(require("../models/User"));
 const signupController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     if (!body.email && !body.name && !body.password) {
-        res.status(400).json({ message: "Missing required product fields" });
-        return;
+        const error = new Error("Missing required fields in request");
+        error.status = 400;
+        return error;
     }
     try {
         const { name, email, password } = body;
@@ -31,7 +32,10 @@ const signupController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         res.status(200).json({ message: "User created", userId: user.id });
     }
     catch (err) {
-        console.log(err);
+        if (!err.status) {
+            err.status = 500;
+        }
+        next(err);
     }
 });
 exports.signupController = signupController;
@@ -42,22 +46,30 @@ const loginController = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         error.status = 400;
         return error;
     }
-    const { email, password } = body;
-    const user = dummyData_1.users.find((user) => user.email === email);
-    if (!user) {
-        const error = new Error("A user with this email could not be found");
-        error.status = 404;
-        throw error;
+    try {
+        const { email, password } = body;
+        const user = dummyData_1.users.find((user) => user.email === email);
+        if (!user) {
+            const error = new Error("A user with this email could not be found");
+            error.status = 404;
+            throw error;
+        }
+        const isEqual = yield bcryptjs_1.default.compare(password, user.password);
+        if (!isEqual) {
+            const error = new Error("Wrong password!");
+            error.status = 401;
+            throw error;
+        }
+        const token = jsonwebtoken_1.default.sign({ email: user.email, userId: user.id }, "supersecretkey", {
+            expiresIn: "1h",
+        });
+        res.status(200).json({ token: token, userId: user.id });
     }
-    const isEqual = yield bcryptjs_1.default.compare(password, user.password);
-    if (!isEqual) {
-        const error = new Error("Wrong password!");
-        error.status = 401;
-        throw error;
+    catch (err) {
+        if (!err.status) {
+            err.status = 500;
+        }
+        next(err);
     }
-    const token = jsonwebtoken_1.default.sign({ email: user.email, userId: user.id }, "supersecretkey", {
-        expiresIn: "1h",
-    });
-    res.status(200).json({ token: token, userId: user.id });
 });
 exports.loginController = loginController;

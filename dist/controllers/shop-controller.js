@@ -9,21 +9,39 @@ const getProductController = (req, res, next) => {
         return;
     }
     const prodId = param.prodId;
-    const product = dummyData_1.products.find((prod) => prod.id === prodId);
-    if (!product) {
-        const error = new Error("The requested product could not be found");
-        error.status = 404;
-        throw error;
+    try {
+        const product = dummyData_1.products.find((prod) => prod.id === prodId);
+        if (!product) {
+            const error = new Error("The requested product could not be found");
+            error.status = 404;
+            throw error;
+        }
+        res
+            .status(200)
+            .json({ message: `Retrieved product ${prodId}`, product: product });
     }
-    res
-        .status(200)
-        .json({ message: `Retrieved product ${prodId}`, product: product });
+    catch (err) {
+        if (!err.status) {
+            err.status = 500;
+        }
+        next(err);
+    }
 };
 exports.getProductController = getProductController;
 const getProductsController = (req, res, next) => {
-    const productNames = dummyData_1.products.map((product) => {
-        return { id: product.id, title: product.title };
-    });
-    res.status(200).json({ message: "Pulled all items", products: productNames });
+    try {
+        const productNames = dummyData_1.products.map((product) => {
+            return { id: product.id, title: product.title };
+        });
+        res
+            .status(200)
+            .json({ message: "Pulled all items", products: productNames });
+    }
+    catch (err) {
+        if (!err.status) {
+            err.status = 500;
+        }
+        next(err);
+    }
 };
 exports.getProductsController = getProductsController;
