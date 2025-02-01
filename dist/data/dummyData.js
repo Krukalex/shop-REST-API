@@ -1,4 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.products = void 0;
+exports.users = exports.products = void 0;
 exports.products = [];
+exports.users = [];
