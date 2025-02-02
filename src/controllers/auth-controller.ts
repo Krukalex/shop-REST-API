@@ -30,6 +30,14 @@ export const signupController = async (
   }
   try {
     const { name, email, password } = body;
+    const existingUser: User | undefined = User.getByEmail(body.email);
+    if (existingUser) {
+      const error = new Error(
+        "User with this email already exists, login or use a different email"
+      ) as any;
+      error.status = 409;
+      throw error;
+    }
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = new User(name, email, hashedPassword);
     user.save();
@@ -55,7 +63,7 @@ export const loginController = async (
   }
   try {
     const { email, password } = body;
-    const user: User | undefined = users.find((user) => user.email === email);
+    const user: User | undefined = User.getByEmail(email);
     if (!user) {
       const error = new Error(
         "A user with this email could not be found"

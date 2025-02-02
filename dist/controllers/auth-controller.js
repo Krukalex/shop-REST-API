@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginController = exports.signupController = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const dummyData_1 = require("../data/dummyData");
 const User_1 = __importDefault(require("../models/User"));
 const signupController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
@@ -26,6 +25,12 @@ const signupController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     }
     try {
         const { name, email, password } = body;
+        const existingUser = User_1.default.getByEmail(body.email);
+        if (existingUser) {
+            const error = new Error("User with this email already exists, login or use a different email");
+            error.status = 409;
+            throw error;
+        }
         const hashedPassword = yield bcryptjs_1.default.hash(password, 12);
         const user = new User_1.default(name, email, hashedPassword);
         user.save();
@@ -48,7 +53,7 @@ const loginController = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     }
     try {
         const { email, password } = body;
-        const user = dummyData_1.users.find((user) => user.email === email);
+        const user = User_1.default.getByEmail(email);
         if (!user) {
             const error = new Error("A user with this email could not be found");
             error.status = 404;

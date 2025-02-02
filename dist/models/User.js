@@ -29,7 +29,16 @@ class User {
         }
         return this.id;
     }
-    static getById(id) { }
+    static getByEmail(email) {
+        const findStatement = db_1.db.prepare("select * from Users where email = ?");
+        const existingUser = findStatement.get(email);
+        if (existingUser) {
+            const { user_id, name, email, password, created_at, updated_at } = existingUser;
+            const user = new User(name, email, password, user_id, created_at, updated_at);
+            return user;
+        }
+        return undefined;
+    }
     static fetchAll() { }
     static deleteById(id) { }
 }

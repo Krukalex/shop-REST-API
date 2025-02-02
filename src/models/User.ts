@@ -1,6 +1,15 @@
 import { randomUUID } from "crypto";
 import { db } from "../data/db";
 
+interface UserResult {
+  user_id: string;
+  name: string;
+  email: string;
+  password: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export default class User {
   id: string;
   name: string;
@@ -56,7 +65,24 @@ export default class User {
     return this.id;
   }
 
-  public static getById(id: string) {}
+  public static getByEmail(email: string) {
+    const findStatement = db.prepare("select * from Users where email = ?");
+    const existingUser = findStatement.get(email) as UserResult | undefined;
+    if (existingUser) {
+      const { user_id, name, email, password, created_at, updated_at } =
+        existingUser;
+      const user = new User(
+        name,
+        email,
+        password,
+        user_id,
+        created_at,
+        updated_at
+      );
+      return user;
+    }
+    return undefined;
+  }
 
   public static fetchAll() {}
 
