@@ -1,4 +1,3 @@
-import { products } from "../data/dummyData";
 import Product from "../models/Product";
 import jwt from "jsonwebtoken";
 
@@ -14,9 +13,7 @@ export const getProductController = (req: any, res: any, next: any) => {
   }
   const prodId = param.prodId;
   try {
-    const product: Product | undefined = products.find(
-      (prod: Product) => prod.id === prodId
-    );
+    const product: Product | undefined = Product.getById(prodId);
     if (!product) {
       const error = new Error(
         "The requested product could not be found"
@@ -37,8 +34,9 @@ export const getProductController = (req: any, res: any, next: any) => {
 
 export const getProductsController = (req: any, res: any, next: any) => {
   try {
+    const products: Array<Product> = Product.fetchAll();
     const productNames = products.map((product) => {
-      return { id: product.id, title: product.title };
+      return { id: product.product_id, title: product.title };
     });
     res
       .status(200)

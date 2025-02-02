@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import Product from "../models/Product";
-import { products } from "../data/dummyData";
+// import { products } from "../data/dummyData";
 
 interface PostProductBody {
   title: string;
@@ -24,8 +24,9 @@ export const getProductController = (req: any, res: any, next: any) => {
   }
   const prodId = param.prodId;
   try {
+    const products: Array<Product> = Product.fetchAll();
     const product: Product | undefined = products.find(
-      (prod: Product) => prod.id === prodId
+      (prod: Product) => prod.product_id === prodId
     );
     res
       .status(200)
@@ -53,10 +54,16 @@ export const createProductController = (
   const userId = req.userId!;
   try {
     const newProduct = new Product(title, description, price, userId);
-    products.push(newProduct);
+    newProduct.save();
     res.status(201).json({
       message: "successfully created new product",
-      products: products,
+      products: {
+        product_id: newProduct.product_id,
+        title: newProduct.title,
+        description: newProduct.description,
+        price: newProduct.price,
+        creator: newProduct.user_id,
+      },
     });
   } catch (err: any) {
     if (!err.status) {
@@ -85,8 +92,12 @@ export const updateProductController = (
   }
   const prodId = param.prodId;
   try {
-    const prodIndex: number = products.findIndex((prod) => prod.id === prodId);
-    const product = products[prodIndex];
+    const product: Product | undefined = Product.getById(prodId);
+    if (!product) {
+      const error = new Error(`Product ${prodId} could not be found`) as any;
+      error.status = 404;
+      throw error;
+    }
     if (body.title) {
       product.title = body.title;
     }
@@ -96,7 +107,7 @@ export const updateProductController = (
     if (body.price) {
       product.price = body.price;
     }
-    products[prodIndex] = product;
+    product.save();
     res.status(200).json({
       message: `Successfully updated product ${prodId}`,
       product: product,
@@ -122,13 +133,16 @@ export const deleteProductController = (
   }
   const prodId = param.prodId;
   try {
-    const index = products.findIndex((prod) => prod.id === prodId);
-    if (index !== -1) {
-      products.splice(index, 1);
+    const deleted: Boolean = Product.deleteById(prodId);
+    if (!deleted) {
+      const error = new Error(
+        `Product with id ${prodId} could not be found`
+      ) as any;
+      error.status = 404;
+      throw error;
     }
     res.status(200).json({
       message: `Successfully deleted product ${prodId}`,
-      products: products,
     });
   } catch (err: any) {
     if (!err.status) {

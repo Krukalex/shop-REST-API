@@ -34,7 +34,7 @@ const signupController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         const hashedPassword = yield bcryptjs_1.default.hash(password, 12);
         const user = new User_1.default(name, email, hashedPassword);
         user.save();
-        res.status(200).json({ message: "User created", userId: user.id });
+        res.status(200).json({ message: "User created", userId: user.user_id });
     }
     catch (err) {
         if (!err.status) {
@@ -65,10 +65,10 @@ const loginController = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
             error.status = 401;
             throw error;
         }
-        const token = jsonwebtoken_1.default.sign({ email: user.email, userId: user.id }, "supersecretkey", {
+        const token = jsonwebtoken_1.default.sign({ email: user.email, userId: user.user_id }, "supersecretkey", {
             expiresIn: "1h",
         });
-        res.status(200).json({ token: token, userId: user.id });
+        res.status(200).json({ token: token, userId: user.user_id });
     }
     catch (err) {
         if (!err.status) {

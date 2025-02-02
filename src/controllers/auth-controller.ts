@@ -2,8 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import jwt, { Jwt } from "jsonwebtoken";
 
-import { users } from "../data/dummyData";
-
 import User from "../models/User";
 
 interface SignupBody {
@@ -41,7 +39,7 @@ export const signupController = async (
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = new User(name, email, hashedPassword);
     user.save();
-    res.status(200).json({ message: "User created", userId: user.id });
+    res.status(200).json({ message: "User created", userId: user.user_id });
   } catch (err: any) {
     if (!err.status) {
       err.status = 500;
@@ -78,13 +76,13 @@ export const loginController = async (
       throw error;
     }
     const token = jwt.sign(
-      { email: user.email, userId: user.id },
+      { email: user.email, userId: user.user_id },
       "supersecretkey",
       {
         expiresIn: "1h",
       }
     );
-    res.status(200).json({ token: token, userId: user.id });
+    res.status(200).json({ token: token, userId: user.user_id });
   } catch (err: any) {
     if (!err.status) {
       err.status = 500;

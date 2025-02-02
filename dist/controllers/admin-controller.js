@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProductController = exports.updateProductController = exports.createProductController = exports.getProductController = void 0;
 const Product_1 = __importDefault(require("../models/Product"));
-const dummyData_1 = require("../data/dummyData");
 const getProductController = (req, res, next) => {
     const param = req.params;
     if (!param.prodId) {
@@ -15,7 +14,8 @@ const getProductController = (req, res, next) => {
     }
     const prodId = param.prodId;
     try {
-        const product = dummyData_1.products.find((prod) => prod.id === prodId);
+        const products = Product_1.default.fetchAll();
+        const product = products.find((prod) => prod.product_id === prodId);
         res
             .status(200)
             .json({ message: `Retrieved product ${prodId}`, product: product });
@@ -39,10 +39,16 @@ const createProductController = (req, res, next) => {
     const userId = req.userId;
     try {
         const newProduct = new Product_1.default(title, description, price, userId);
-        dummyData_1.products.push(newProduct);
+        newProduct.save();
         res.status(201).json({
             message: "successfully created new product",
-            products: dummyData_1.products,
+            products: {
+                product_id: newProduct.product_id,
+                title: newProduct.title,
+                description: newProduct.description,
+                price: newProduct.price,
+                creator: newProduct.user_id,
+            },
         });
     }
     catch (err) {
@@ -68,8 +74,12 @@ const updateProductController = (req, res, next) => {
     }
     const prodId = param.prodId;
     try {
-        const prodIndex = dummyData_1.products.findIndex((prod) => prod.id === prodId);
-        const product = dummyData_1.products[prodIndex];
+        const product = Product_1.default.getById(prodId);
+        if (!product) {
+            const error = new Error(`Product ${prodId} could not be found`);
+            error.status = 404;
+            throw error;
+        }
         if (body.title) {
             product.title = body.title;
         }
@@ -79,7 +89,7 @@ const updateProductController = (req, res, next) => {
         if (body.price) {
             product.price = body.price;
         }
-        dummyData_1.products[prodIndex] = product;
+        product.save();
         res.status(200).json({
             message: `Successfully updated product ${prodId}`,
             product: product,
@@ -102,13 +112,14 @@ const deleteProductController = (req, res, next) => {
     }
     const prodId = param.prodId;
     try {
-        const index = dummyData_1.products.findIndex((prod) => prod.id === prodId);
-        if (index !== -1) {
-            dummyData_1.products.splice(index, 1);
+        const deleted = Product_1.default.deleteById(prodId);
+        if (!deleted) {
+            const error = new Error(`Product with id ${prodId} could not be found`);
+            error.status = 404;
+            throw error;
         }
         res.status(200).json({
             message: `Successfully deleted product ${prodId}`,
-            products: dummyData_1.products,
         });
     }
     catch (err) {

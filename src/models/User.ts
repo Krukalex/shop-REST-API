@@ -1,17 +1,8 @@
 import { randomUUID } from "crypto";
 import { db } from "../data/db";
 
-interface UserResult {
-  user_id: string;
-  name: string;
-  email: string;
-  password: string;
-  created_at: Date;
-  updated_at: Date;
-}
-
 export default class User {
-  id: string;
+  user_id: string;
   name: string;
   email: string;
   password: string;
@@ -22,11 +13,11 @@ export default class User {
     name: string,
     email: string,
     password: string,
-    id?: string,
+    user_id?: string,
     created_at?: Date,
     updated_at?: Date
   ) {
-    this.id = id || randomUUID();
+    this.user_id = user_id || randomUUID();
     this.name = name;
     this.email = email;
     this.password = password;
@@ -35,7 +26,7 @@ export default class User {
   }
 
   public save() {
-    const findStatement = db.prepare("select * from Users where email = ?");
+    const findStatement = db.prepare("SELECT * FROM Users WHERE email = ?");
     const existingUser = findStatement.get(this.email);
 
     if (existingUser) {
@@ -54,7 +45,7 @@ export default class User {
         VALUES (?, ?, ?, ?, ?, ?)
       `);
       stmtInsert.run(
-        this.id,
+        this.user_id,
         this.name,
         this.email,
         this.password,
@@ -62,12 +53,12 @@ export default class User {
         this.updated_at.toISOString()
       );
     }
-    return this.id;
+    return this.user_id;
   }
 
   public static getByEmail(email: string) {
-    const findStatement = db.prepare("select * from Users where email = ?");
-    const existingUser = findStatement.get(email) as UserResult | undefined;
+    const findStatement = db.prepare("SELECT * FROM Users WHERE email = ?");
+    const existingUser = findStatement.get(email) as User | undefined;
     if (existingUser) {
       const { user_id, name, email, password, created_at, updated_at } =
         existingUser;
@@ -88,19 +79,3 @@ export default class User {
 
   public static deleteById(id: string) {}
 }
-
-// interface User {
-//   user_id: number;
-//   name: string;
-//   email: string;
-//   password: string;
-//   created_at: Date;
-// }
-
-// class UserModel {
-//   private db: Database.Database;
-
-//   constructor(database: Database.Database) {
-//     this.db = database;
-//   }
-// }

@@ -1,7 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProductsController = exports.getProductController = void 0;
-const dummyData_1 = require("../data/dummyData");
+const Product_1 = __importDefault(require("../models/Product"));
 const getProductController = (req, res, next) => {
     const param = req.params;
     if (!param.prodId) {
@@ -10,7 +13,7 @@ const getProductController = (req, res, next) => {
     }
     const prodId = param.prodId;
     try {
-        const product = dummyData_1.products.find((prod) => prod.id === prodId);
+        const product = Product_1.default.getById(prodId);
         if (!product) {
             const error = new Error("The requested product could not be found");
             error.status = 404;
@@ -30,8 +33,9 @@ const getProductController = (req, res, next) => {
 exports.getProductController = getProductController;
 const getProductsController = (req, res, next) => {
     try {
-        const productNames = dummyData_1.products.map((product) => {
-            return { id: product.id, title: product.title };
+        const products = Product_1.default.fetchAll();
+        const productNames = products.map((product) => {
+            return { id: product.product_id, title: product.title };
         });
         res
             .status(200)
