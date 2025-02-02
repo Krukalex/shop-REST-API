@@ -36,8 +36,9 @@ const createProductController = (req, res, next) => {
         throw error;
     }
     const { title, description, price } = body;
+    const userId = req.userId;
     try {
-        const newProduct = new Product_1.default(title, description, price);
+        const newProduct = new Product_1.default(title, description, price, userId);
         dummyData_1.products.push(newProduct);
         res.status(201).json({
             message: "successfully created new product",

@@ -32,7 +32,7 @@ export const signupController = async (
     const { name, email, password } = body;
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = new User(name, email, hashedPassword);
-    users.push(user);
+    user.save();
     res.status(200).json({ message: "User created", userId: user.id });
   } catch (err: any) {
     if (!err.status) {

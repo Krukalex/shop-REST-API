@@ -28,7 +28,7 @@ const signupController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         const { name, email, password } = body;
         const hashedPassword = yield bcryptjs_1.default.hash(password, 12);
         const user = new User_1.default(name, email, hashedPassword);
-        dummyData_1.users.push(user);
+        user.save();
         res.status(200).json({ message: "User created", userId: user.id });
     }
     catch (err) {

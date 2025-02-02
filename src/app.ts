@@ -3,11 +3,15 @@ import { Express } from "express";
 import express from "express";
 import { Request, Response, NextFunction } from "express";
 
+import { create_db } from "./data/db";
+
 import shopRouter from "./routes/shop";
 import adminRouter from "./routes/admin";
 import authRouter from "./routes/auth";
 
 const app: Express = express();
+
+create_db();
 
 app.use(express.json());
 

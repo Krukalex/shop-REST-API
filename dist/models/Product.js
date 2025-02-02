@@ -2,11 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_1 = require("crypto");
 class Product {
-    constructor(title, description, price) {
+    constructor(title, description, price, userId) {
         this.id = (0, crypto_1.randomUUID)();
         this.title = title;
         this.description = description;
         this.price = price;
+        this.userId = userId;
     }
 }
 exports.default = Product;

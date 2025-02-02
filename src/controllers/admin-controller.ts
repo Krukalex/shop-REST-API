@@ -50,8 +50,9 @@ export const createProductController = (
     throw error;
   }
   const { title, description, price } = body;
+  const userId = req.userId!;
   try {
-    const newProduct = new Product(title, description, price);
+    const newProduct = new Product(title, description, price, userId);
     products.push(newProduct);
     res.status(201).json({
       message: "successfully created new product",

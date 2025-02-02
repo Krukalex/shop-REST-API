@@ -5,11 +5,18 @@ export default class Product {
   title: string;
   description: string;
   price: number;
+  userId: string;
 
-  constructor(title: string, description: string, price: number) {
+  constructor(
+    title: string,
+    description: string,
+    price: number,
+    userId: string
+  ) {
     this.id = randomUUID();
     this.title = title;
     this.description = description;
     this.price = price;
+    this.userId = userId;
   }
 }
