@@ -13,7 +13,7 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 // app.use(bodyParser.json());
 app.use(shop_1.default);
-app.use(admin_1.default);
+app.use("/admin", admin_1.default);
 app.use("/auth", auth_1.default);
 app.use((error, req, res, next) => {
     console.log(error);

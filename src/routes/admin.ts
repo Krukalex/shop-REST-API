@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getProductsController,
   createProductController,
   deleteProductController,
   updateProductController,
@@ -7,6 +8,8 @@ import {
 import { isAuth } from "../middleware/isAuth";
 
 const adminRouter = Router();
+
+adminRouter.get("/products", isAuth, getProductsController);
 
 adminRouter.post("/products", isAuth, createProductController);
 

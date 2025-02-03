@@ -15,22 +15,19 @@ interface UpdateProductBody {
   price?: number;
 }
 
-export const getProductController = (req: any, res: any, next: any) => {
-  const param = req.params;
-  if (!param.prodId) {
-    const error = new Error("Bad Request: Request params is required") as any;
-    error.status = 400;
-    throw error;
-  }
-  const prodId = param.prodId;
+export const getProductsController = (req: any, res: any, next: any) => {
   try {
-    const products: Array<Product> = Product.fetchAll();
-    const product: Product | undefined = products.find(
-      (prod: Product) => prod.product_id === prodId
-    );
+    const userId = req.userId!;
+    const products: Array<Product> = Product.getUserProducts(userId);
+    const productNames = products.map((product) => {
+      return { id: product.product_id, title: product.title };
+    });
     res
       .status(200)
-      .json({ message: `Retrieved product ${prodId}`, product: product });
+      .json({
+        message: `Pulled all items for user ${userId}`,
+        products: productNames,
+      });
   } catch (err: any) {
     if (!err.status) {
       err.status = 500;
@@ -91,11 +88,19 @@ export const updateProductController = (
     throw error;
   }
   const prodId = param.prodId;
+  const userId = req.userId!;
   try {
     const product: Product | undefined = Product.getById(prodId);
     if (!product) {
       const error = new Error(`Product ${prodId} could not be found`) as any;
       error.status = 404;
+      throw error;
+    }
+    if (userId != product.user_id) {
+      const error = new Error(
+        `Only the creator of a product is authorized to modify or delete it`
+      ) as any;
+      error.status = 401;
       throw error;
     }
     if (body.title) {
@@ -132,15 +137,22 @@ export const deleteProductController = (
     throw error;
   }
   const prodId = param.prodId;
+  const userId = req.userId!;
   try {
-    const deleted: Boolean = Product.deleteById(prodId);
-    if (!deleted) {
-      const error = new Error(
-        `Product with id ${prodId} could not be found`
-      ) as any;
+    const product: Product | undefined = Product.getById(prodId);
+    if (!product) {
+      const error = new Error(`Product ${prodId} not found`) as any;
       error.status = 404;
       throw error;
     }
+    if (userId != product.user_id) {
+      const error = new Error(
+        `Only the creator of a product is authorized to modify or delete it`
+      ) as any;
+      error.status = 401;
+      throw error;
+    }
+    const deleted: Boolean = Product.deleteById(prodId);
     res.status(200).json({
       message: `Successfully deleted product ${prodId}`,
     });

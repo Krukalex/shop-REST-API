@@ -42,6 +42,13 @@ class Product {
         }
         return undefined;
     }
+    static getUserProducts(user_id) {
+        const findStatement = db_1.db.prepare(`
+        SELECT * FROM Products WHERE user_id = ?
+      `);
+        const userProducts = findStatement.all(user_id);
+        return userProducts.map((productData) => new Product(productData.title, productData.description, productData.price, productData.user_id, productData.product_id, productData.created_at, productData.updated_at));
+    }
     static fetchAll() {
         const findStatement = db_1.db.prepare(`
         SELECT * FROM Products

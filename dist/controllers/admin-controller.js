@@ -3,22 +3,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProductController = exports.updateProductController = exports.createProductController = exports.getProductController = void 0;
+exports.deleteProductController = exports.updateProductController = exports.createProductController = exports.getProductsController = void 0;
 const Product_1 = __importDefault(require("../models/Product"));
-const getProductController = (req, res, next) => {
-    const param = req.params;
-    if (!param.prodId) {
-        const error = new Error("Bad Request: Request params is required");
-        error.status = 400;
-        throw error;
-    }
-    const prodId = param.prodId;
+const getProductsController = (req, res, next) => {
     try {
-        const products = Product_1.default.fetchAll();
-        const product = products.find((prod) => prod.product_id === prodId);
+        const userId = req.userId;
+        const products = Product_1.default.getUserProducts(userId);
+        const productNames = products.map((product) => {
+            return { id: product.product_id, title: product.title };
+        });
         res
             .status(200)
-            .json({ message: `Retrieved product ${prodId}`, product: product });
+            .json({
+            message: `Pulled all items for user ${userId}`,
+            products: productNames,
+        });
     }
     catch (err) {
         if (!err.status) {
@@ -27,7 +26,7 @@ const getProductController = (req, res, next) => {
         next(err);
     }
 };
-exports.getProductController = getProductController;
+exports.getProductsController = getProductsController;
 const createProductController = (req, res, next) => {
     const body = req.body;
     if (!body.title || !body.description || body.price == null) {
@@ -73,11 +72,17 @@ const updateProductController = (req, res, next) => {
         throw error;
     }
     const prodId = param.prodId;
+    const userId = req.userId;
     try {
         const product = Product_1.default.getById(prodId);
         if (!product) {
             const error = new Error(`Product ${prodId} could not be found`);
             error.status = 404;
+            throw error;
+        }
+        if (userId != product.user_id) {
+            const error = new Error(`Only the creator of a product is authorized to modify or delete it`);
+            error.status = 401;
             throw error;
         }
         if (body.title) {
@@ -111,13 +116,20 @@ const deleteProductController = (req, res, next) => {
         throw error;
     }
     const prodId = param.prodId;
+    const userId = req.userId;
     try {
-        const deleted = Product_1.default.deleteById(prodId);
-        if (!deleted) {
-            const error = new Error(`Product with id ${prodId} could not be found`);
+        const product = Product_1.default.getById(prodId);
+        if (!product) {
+            const error = new Error(`Product ${prodId} not found`);
             error.status = 404;
             throw error;
         }
+        if (userId != product.user_id) {
+            const error = new Error(`Only the creator of a product is authorized to modify or delete it`);
+            error.status = 401;
+            throw error;
+        }
+        const deleted = Product_1.default.deleteById(prodId);
         res.status(200).json({
             message: `Successfully deleted product ${prodId}`,
         });

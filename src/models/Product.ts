@@ -93,6 +93,25 @@ export default class Product {
     return undefined;
   }
 
+  public static getUserProducts(user_id: string) {
+    const findStatement = db.prepare(`
+        SELECT * FROM Products WHERE user_id = ?
+      `);
+    const userProducts = findStatement.all(user_id);
+    return userProducts.map(
+      (productData: any) =>
+        new Product(
+          productData.title,
+          productData.description,
+          productData.price,
+          productData.user_id,
+          productData.product_id,
+          productData.created_at,
+          productData.updated_at
+        )
+    );
+  }
+
   public static fetchAll() {
     const findStatement = db.prepare(`
         SELECT * FROM Products

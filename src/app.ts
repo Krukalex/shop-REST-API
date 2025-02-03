@@ -18,7 +18,7 @@ app.use(express.json());
 // app.use(bodyParser.json());
 
 app.use(shopRouter);
-app.use(adminRouter);
+app.use("/admin", adminRouter);
 app.use("/auth", authRouter);
 
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
