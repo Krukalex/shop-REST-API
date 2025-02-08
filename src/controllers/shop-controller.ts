@@ -53,6 +53,28 @@ export const getProductsController = (
   }
 };
 
+export const getCartController = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.userId!;
+  try {
+    const user = User.getById(userId);
+    if (!user) {
+      throw new NotFoundError();
+    }
+    const cart = user.getCart();
+    res.status(200).json({ message: "Retrieved cart items", cart: cart });
+  } catch (err: any) {
+    console.log(err);
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
 export const addToCartController = (
   req: Request,
   res: Response,

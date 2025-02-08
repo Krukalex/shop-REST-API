@@ -29,6 +29,19 @@ class User {
         }
         return this.user_id;
     }
+    getCart() {
+        const findStatement = db_1.db.prepare(`
+        SELECT
+          *
+        FROM 
+          CartItems ci
+          LEFT OUTER JOIN Cart c on ci.cart_id = c.cart_id
+        WHERE
+          c.user_id = ?
+      `);
+        const cartItems = findStatement.all(this.user_id);
+        return cartItems;
+    }
     addToCart(product, quantity) {
         const findStatement = db_1.db.prepare("SELECT cart_id FROM Cart WHERE user_id = ?");
         const existingCart = findStatement.get(this.user_id);

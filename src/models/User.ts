@@ -57,6 +57,20 @@ export default class User {
     return this.user_id;
   }
 
+  public getCart() {
+    const findStatement = db.prepare(`
+        SELECT
+          *
+        FROM 
+          CartItems ci
+          LEFT OUTER JOIN Cart c on ci.cart_id = c.cart_id
+        WHERE
+          c.user_id = ?
+      `);
+    const cartItems = findStatement.all(this.user_id);
+    return cartItems;
+  }
+
   public addToCart(product: Product, quantity: number) {
     const findStatement = db.prepare(
       "SELECT cart_id FROM Cart WHERE user_id = ?"

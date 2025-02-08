@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addToCartController,
+  getCartController,
   getProductController,
   getProductsController,
 } from "../controllers/shop-controller";
@@ -17,6 +18,8 @@ shopRouter.get(
   isAuth,
   getProductController
 );
+
+shopRouter.get("/get-cart", isAuth, getCartController);
 
 shopRouter.post(
   "/add-to-cart",
