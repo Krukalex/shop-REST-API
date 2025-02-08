@@ -1,13 +1,13 @@
 import bodyParser from "body-parser";
 import { Express } from "express";
 import express from "express";
-import { Request, Response, NextFunction } from "express";
 
 import { create_db } from "./data/db";
 
 import shopRouter from "./routes/shop";
 import adminRouter from "./routes/admin";
 import authRouter from "./routes/auth";
+import { errorHandler } from "./middleware/error-handler";
 
 const app: Express = express();
 
@@ -21,11 +21,6 @@ app.use(shopRouter);
 app.use("/admin", adminRouter);
 app.use("/auth", authRouter);
 
-app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-  console.log(error);
-  const status = error.status || 500;
-  const message = error.message;
-  res.status(status).json({ message: message });
-});
+app.use(errorHandler);
 
 app.listen(3000);

@@ -3,6 +3,11 @@ import bcrypt from "bcryptjs";
 import jwt, { Jwt } from "jsonwebtoken";
 
 import User from "../models/User";
+import { validationResult } from "express-validator";
+import { RequestValidationError } from "../errors/request-validation-error";
+import { ExistingUserError } from "../errors/existing-user-error";
+import { NotFoundError } from "../errors/not-found-error";
+import { IncorrectPasswordError } from "../errors/incorrect-password-error";
 
 interface SignupBody {
   name: string;
@@ -20,29 +25,24 @@ export const signupController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const body: SignupBody = req.body;
-  if (!body.email && !body.name && !body.password) {
-    const error = new Error("Missing required fields in request") as any;
-    error.status = 400;
-    return error;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new RequestValidationError(errors.array()));
   }
+  const body: SignupBody = req.body;
   try {
     const { name, email, password } = body;
     const existingUser: User | undefined = User.getByEmail(body.email);
     if (existingUser) {
-      const error = new Error(
-        "User with this email already exists, login or use a different email"
-      ) as any;
-      error.status = 409;
-      throw error;
+      throw new ExistingUserError();
     }
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = new User(name, email, hashedPassword);
     user.save();
     res.status(200).json({ message: "User created", userId: user.user_id });
   } catch (err: any) {
-    if (!err.status) {
-      err.status = 500;
+    if (!err.statusCode) {
+      err.statusCode = 500;
     }
     next(err);
   }
@@ -53,27 +53,20 @@ export const loginController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const body: LoginBody = req.body;
-  if (!body.email && !body.password) {
-    const error = new Error("Missing required fields in request") as any;
-    error.status = 400;
-    return error;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new RequestValidationError(errors.array()));
   }
+  const body: LoginBody = req.body;
   try {
     const { email, password } = body;
     const user: User | undefined = User.getByEmail(email);
     if (!user) {
-      const error = new Error(
-        "A user with this email could not be found"
-      ) as any;
-      error.status = 404;
-      throw error;
+      throw new NotFoundError();
     }
     const isEqual = await bcrypt.compare(password, user.password);
     if (!isEqual) {
-      const error = new Error("Wrong password!") as any;
-      error.status = 401;
-      throw error;
+      throw new IncorrectPasswordError();
     }
     const token = jwt.sign(
       { email: user.email, userId: user.user_id },
@@ -84,8 +77,8 @@ export const loginController = async (
     );
     res.status(200).json({ token: token, userId: user.user_id });
   } catch (err: any) {
-    if (!err.status) {
-      err.status = 500;
+    if (!err.statusCode) {
+      err.statusCode = 500;
     }
     next(err);
   }

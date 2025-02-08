@@ -4,28 +4,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProductsController = exports.getProductController = void 0;
+const express_validator_1 = require("express-validator");
 const Product_1 = __importDefault(require("../models/Product"));
+const request_validation_error_1 = require("../errors/request-validation-error");
+const not_found_error_1 = require("../errors/not-found-error");
 const getProductController = (req, res, next) => {
-    const param = req.params;
-    if (!param.prodId) {
-        res.status(400).json({ message: "Bad Reqeust: Request param is required" });
-        return;
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (!errors.isEmpty()) {
+        throw new request_validation_error_1.RequestValidationError(errors.array());
     }
+    const param = req.params;
     const prodId = param.prodId;
     try {
         const product = Product_1.default.getById(prodId);
         if (!product) {
-            const error = new Error("The requested product could not be found");
-            error.status = 404;
-            throw error;
+            throw new not_found_error_1.NotFoundError();
         }
         res
             .status(200)
             .json({ message: `Retrieved product ${prodId}`, product: product });
     }
     catch (err) {
-        if (!err.status) {
-            err.status = 500;
+        if (!err.statusCode) {
+            err.statusCode = 500;
         }
         next(err);
     }
@@ -42,8 +43,8 @@ const getProductsController = (req, res, next) => {
             .json({ message: "Pulled all items", products: productNames });
     }
     catch (err) {
-        if (!err.status) {
-            err.status = 500;
+        if (!err.statusCode) {
+            err.statusCode = 500;
         }
         next(err);
     }

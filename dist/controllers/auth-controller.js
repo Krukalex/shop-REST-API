@@ -16,20 +16,22 @@ exports.loginController = exports.signupController = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const User_1 = __importDefault(require("../models/User"));
+const express_validator_1 = require("express-validator");
+const request_validation_error_1 = require("../errors/request-validation-error");
+const existing_user_error_1 = require("../errors/existing-user-error");
+const not_found_error_1 = require("../errors/not-found-error");
+const incorrect_password_error_1 = require("../errors/incorrect-password-error");
 const signupController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    if (!body.email && !body.name && !body.password) {
-        const error = new Error("Missing required fields in request");
-        error.status = 400;
-        return error;
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (!errors.isEmpty()) {
+        return next(new request_validation_error_1.RequestValidationError(errors.array()));
     }
+    const body = req.body;
     try {
         const { name, email, password } = body;
         const existingUser = User_1.default.getByEmail(body.email);
         if (existingUser) {
-            const error = new Error("User with this email already exists, login or use a different email");
-            error.status = 409;
-            throw error;
+            throw new existing_user_error_1.ExistingUserError();
         }
         const hashedPassword = yield bcryptjs_1.default.hash(password, 12);
         const user = new User_1.default(name, email, hashedPassword);
@@ -37,33 +39,28 @@ const signupController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         res.status(200).json({ message: "User created", userId: user.user_id });
     }
     catch (err) {
-        if (!err.status) {
-            err.status = 500;
+        if (!err.statusCode) {
+            err.statusCode = 500;
         }
         next(err);
     }
 });
 exports.signupController = signupController;
 const loginController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    if (!body.email && !body.password) {
-        const error = new Error("Missing required fields in request");
-        error.status = 400;
-        return error;
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (!errors.isEmpty()) {
+        return next(new request_validation_error_1.RequestValidationError(errors.array()));
     }
+    const body = req.body;
     try {
         const { email, password } = body;
         const user = User_1.default.getByEmail(email);
         if (!user) {
-            const error = new Error("A user with this email could not be found");
-            error.status = 404;
-            throw error;
+            throw new not_found_error_1.NotFoundError();
         }
         const isEqual = yield bcryptjs_1.default.compare(password, user.password);
         if (!isEqual) {
-            const error = new Error("Wrong password!");
-            error.status = 401;
-            throw error;
+            throw new incorrect_password_error_1.IncorrectPasswordError();
         }
         const token = jsonwebtoken_1.default.sign({ email: user.email, userId: user.user_id }, "supersecretkey", {
             expiresIn: "1h",
@@ -71,8 +68,8 @@ const loginController = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         res.status(200).json({ token: token, userId: user.user_id });
     }
     catch (err) {
-        if (!err.status) {
-            err.status = 500;
+        if (!err.statusCode) {
+            err.statusCode = 500;
         }
         next(err);
     }

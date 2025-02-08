@@ -1,32 +1,30 @@
+import { validationResult } from "express-validator";
 import Product from "../models/Product";
-import jwt from "jsonwebtoken";
+import { RequestValidationError } from "../errors/request-validation-error";
+import { NotFoundError } from "../errors/not-found-error";
 
 interface GetProductParam {
   prodId: string;
 }
 
 export const getProductController = (req: any, res: any, next: any) => {
-  const param: GetProductParam = req.params;
-  if (!param.prodId) {
-    res.status(400).json({ message: "Bad Reqeust: Request param is required" });
-    return;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new RequestValidationError(errors.array());
   }
+  const param: GetProductParam = req.params;
   const prodId = param.prodId;
   try {
     const product: Product | undefined = Product.getById(prodId);
     if (!product) {
-      const error = new Error(
-        "The requested product could not be found"
-      ) as any;
-      error.status = 404;
-      throw error;
+      throw new NotFoundError();
     }
     res
       .status(200)
       .json({ message: `Retrieved product ${prodId}`, product: product });
   } catch (err: any) {
-    if (!err.status) {
-      err.status = 500;
+    if (!err.statusCode) {
+      err.statusCode = 500;
     }
     next(err);
   }
@@ -42,8 +40,8 @@ export const getProductsController = (req: any, res: any, next: any) => {
       .status(200)
       .json({ message: "Pulled all items", products: productNames });
   } catch (err: any) {
-    if (!err.status) {
-      err.status = 500;
+    if (!err.statusCode) {
+      err.statusCode = 500;
     }
     next(err);
   }
