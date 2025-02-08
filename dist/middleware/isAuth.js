@@ -5,18 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAuth = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const unauthorized_error_1 = require("../errors/unauthorized-error");
 const isAuth = (req, res, next) => {
     const authHeader = req.get("Authorization");
     if (!authHeader) {
-        const error = new Error("Not authenticated");
-        error.status = 401;
-        throw error;
+        throw new unauthorized_error_1.UnauthorizedError();
     }
     const token = authHeader.split(" ")[1];
     if (!token) {
-        const error = new Error("Not authenticated");
-        error.status = 401;
-        throw error;
+        throw new unauthorized_error_1.UnauthorizedError();
     }
     let decodedToken;
     try {
@@ -26,8 +23,7 @@ const isAuth = (req, res, next) => {
         throw err;
     }
     if (!decodedToken) {
-        const error = new Error("Not authenticated");
-        throw error;
+        throw new unauthorized_error_1.UnauthorizedError();
     }
     req.userId = decodedToken.userId;
     next();

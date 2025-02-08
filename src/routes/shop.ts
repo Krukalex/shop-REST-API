@@ -4,6 +4,7 @@ import {
   getCartController,
   getProductController,
   getProductsController,
+  removeFromCartController,
 } from "../controllers/shop-controller";
 import { isAuth } from "../middleware/isAuth";
 import { param, body } from "express-validator";
@@ -24,11 +25,21 @@ shopRouter.get("/get-cart", isAuth, getCartController);
 shopRouter.post(
   "/add-to-cart",
   [
-    body("productId").notEmpty().withMessage("Product ID is required"),
+    body("prodId").notEmpty().withMessage("Product ID is required"),
     body("quantity").notEmpty().isNumeric().withMessage("quantity is required"),
   ],
   isAuth,
   addToCartController
+);
+
+shopRouter.delete(
+  "/remove-from-cart",
+  [
+    body("prodId").notEmpty().withMessage("Product ID is required"),
+    body("quantity").notEmpty().isNumeric().withMessage("quantity is required"),
+  ],
+  isAuth,
+  removeFromCartController
 );
 
 export default shopRouter;

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addToCartController = exports.getCartController = exports.getProductsController = exports.getProductController = void 0;
+exports.removeFromCartController = exports.addToCartController = exports.getCartController = exports.getProductsController = exports.getProductController = void 0;
 const express_validator_1 = require("express-validator");
 const Product_1 = __importDefault(require("../models/Product"));
 const request_validation_error_1 = require("../errors/request-validation-error");
@@ -76,14 +76,14 @@ const addToCartController = (req, res, next) => {
         throw new request_validation_error_1.RequestValidationError(errors.array());
     }
     const body = req.body;
-    const { productId, quantity } = body;
+    const { prodId, quantity } = body;
     const userId = req.userId;
     try {
         const user = User_1.default.getById(userId);
         if (!user) {
             throw new not_found_error_1.NotFoundError();
         }
-        const product = Product_1.default.getById(productId);
+        const product = Product_1.default.getById(prodId);
         if (!product) {
             throw new not_found_error_1.NotFoundError();
         }
@@ -98,7 +98,6 @@ const addToCartController = (req, res, next) => {
         });
     }
     catch (err) {
-        console.log(err);
         if (!err.statusCode) {
             err.statusCode = 500;
         }
@@ -106,3 +105,30 @@ const addToCartController = (req, res, next) => {
     }
 };
 exports.addToCartController = addToCartController;
+const removeFromCartController = (req, res, next) => {
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (!errors.isEmpty()) {
+        throw new request_validation_error_1.RequestValidationError(errors.array());
+    }
+    const { prodId, quantity } = req.body;
+    const userId = req.userId;
+    try {
+        const user = User_1.default.getById(userId);
+        if (!user) {
+            throw new not_found_error_1.NotFoundError();
+        }
+        user.removeFromCart(prodId, quantity);
+        const updatedCart = user.getCart();
+        res.status(200).json({
+            message: "Successfully remove items from cart",
+            cart: updatedCart,
+        });
+    }
+    catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+exports.removeFromCartController = removeFromCartController;

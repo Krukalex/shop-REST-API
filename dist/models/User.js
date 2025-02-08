@@ -78,6 +78,36 @@ class User {
         }
         return true;
     }
+    removeFromCart(productId, quantity) {
+        const findStatement = db_1.db.prepare("SELECT cart_id FROM Cart WHERE user_id = ?");
+        const existingCart = findStatement.get(this.user_id);
+        if (!existingCart) {
+            return false;
+        }
+        const { cart_id } = existingCart;
+        const findProdStmt = db_1.db.prepare("SELECT cart_item_id, quantity FROM CartItems WHERE cart_id = ? and product_id = ?");
+        const existingProduct = findProdStmt.get(cart_id, productId);
+        if (!existingProduct) {
+            return false;
+        }
+        const newQuantity = existingProduct.quantity - quantity;
+        if (newQuantity > 0) {
+            const updateCartStmt = db_1.db.prepare(`
+        UPDATE CartItems
+        SET quantity = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE cart_item_id = ?
+        `);
+            updateCartStmt.run(newQuantity, existingProduct.cart_item_id);
+        }
+        else {
+            const deleteItemStmt = db_1.db.prepare(`
+        DELETE FROM CartItems
+        WHERE cart_item_id = ?
+        `);
+            deleteItemStmt.run(existingProduct.cart_item_id);
+        }
+        return true;
+    }
     static getByEmail(email) {
         const findStatement = db_1.db.prepare("SELECT * FROM Users WHERE email = ?");
         const existingUser = findStatement.get(email);

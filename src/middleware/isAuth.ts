@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import { UnauthorizedError } from "../errors/unauthorized-error";
 
 interface JwtPayload {
   userId: string;
@@ -9,15 +10,11 @@ interface JwtPayload {
 export const isAuth = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.get("Authorization");
   if (!authHeader) {
-    const error = new Error("Not authenticated") as any;
-    error.status = 401;
-    throw error;
+    throw new UnauthorizedError();
   }
   const token = authHeader.split(" ")[1];
   if (!token) {
-    const error = new Error("Not authenticated") as any;
-    error.status = 401;
-    throw error;
+    throw new UnauthorizedError();
   }
   let decodedToken: JwtPayload;
   try {
@@ -26,8 +23,7 @@ export const isAuth = (req: Request, res: Response, next: NextFunction) => {
     throw err;
   }
   if (!decodedToken) {
-    const error = new Error("Not authenticated");
-    throw error;
+    throw new UnauthorizedError();
   }
   req.userId = decodedToken.userId;
   next();

@@ -84,15 +84,15 @@ export const addToCartController = (
   if (!errors.isEmpty()) {
     throw new RequestValidationError(errors.array());
   }
-  const body = req.body as { productId: string; quantity: number };
-  const { productId, quantity } = body;
+  const body = req.body as { prodId: string; quantity: number };
+  const { prodId, quantity } = body;
   const userId = req.userId!;
   try {
     const user = User.getById(userId);
     if (!user) {
       throw new NotFoundError();
     }
-    const product = Product.getById(productId);
+    const product = Product.getById(prodId);
     if (!product) {
       throw new NotFoundError();
     }
@@ -107,7 +107,36 @@ export const addToCartController = (
       },
     });
   } catch (err: any) {
-    console.log(err);
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+export const removeFromCartController = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new RequestValidationError(errors.array());
+  }
+  const { prodId, quantity } = req.body;
+  const userId = req.userId!;
+  try {
+    const user = User.getById(userId);
+    if (!user) {
+      throw new NotFoundError();
+    }
+    user.removeFromCart(prodId, quantity);
+    const updatedCart = user.getCart();
+    res.status(200).json({
+      message: "Successfully remove items from cart",
+      cart: updatedCart,
+    });
+  } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }

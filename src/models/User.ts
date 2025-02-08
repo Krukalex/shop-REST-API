@@ -117,6 +117,47 @@ export default class User {
     return true;
   }
 
+  public removeFromCart(productId: string, quantity: number) {
+    const findStatement = db.prepare(
+      "SELECT cart_id FROM Cart WHERE user_id = ?"
+    );
+    const existingCart = findStatement.get(this.user_id) as { cart_id: string };
+    if (!existingCart) {
+      return false;
+    }
+
+    const { cart_id } = existingCart;
+    const findProdStmt = db.prepare(
+      "SELECT cart_item_id, quantity FROM CartItems WHERE cart_id = ? and product_id = ?"
+    );
+    const existingProduct = findProdStmt.get(cart_id, productId) as {
+      cart_item_id: number;
+      quantity: number;
+    };
+
+    if (!existingProduct) {
+      return false;
+    }
+
+    const newQuantity = existingProduct.quantity - quantity;
+    if (newQuantity > 0) {
+      const updateCartStmt = db.prepare(`
+        UPDATE CartItems
+        SET quantity = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE cart_item_id = ?
+        `);
+      updateCartStmt.run(newQuantity, existingProduct.cart_item_id);
+    } else {
+      const deleteItemStmt = db.prepare(`
+        DELETE FROM CartItems
+        WHERE cart_item_id = ?
+        `);
+      deleteItemStmt.run(existingProduct.cart_item_id);
+    }
+
+    return true;
+  }
+
   public static getByEmail(email: string) {
     const findStatement = db.prepare("SELECT * FROM Users WHERE email = ?");
     const existingUser = findStatement.get(email) as User | undefined;
