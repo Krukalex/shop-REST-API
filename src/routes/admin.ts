@@ -5,7 +5,7 @@ import {
   deleteProductController,
   updateProductController,
 } from "../controllers/admin-controller";
-import { isAuth } from "../middleware/isAuth";
+import { isAuth } from "../middleware/is-auth";
 import { body, param } from "express-validator";
 
 const adminRouter = Router();

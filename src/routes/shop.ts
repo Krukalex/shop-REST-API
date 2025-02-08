@@ -6,7 +6,7 @@ import {
   getProductsController,
   removeFromCartController,
 } from "../controllers/shop-controller";
-import { isAuth } from "../middleware/isAuth";
+import { isAuth } from "../middleware/is-auth";
 import { param, body } from "express-validator";
 
 const shopRouter = Router();
