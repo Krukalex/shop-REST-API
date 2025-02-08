@@ -26,4 +26,28 @@ export const create_db = () => {
             FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
         )
         `);
+
+  db.exec(`
+        CREATE TABLE IF NOT EXISTS Cart (
+            cart_id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Use INTEGER for auto-increment
+            user_id TEXT NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+        );
+        `);
+
+  db.exec(`
+        CREATE TABLE IF NOT EXISTS CartItems (
+            cart_item_id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Use INTEGER for auto-increment
+            cart_id INTEGER NOT NULL,
+            product_id TEXT NOT NULL,
+            quantity INTEGER NOT NULL CHECK (quantity > 0),
+            price INTEGER NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (cart_id) REFERENCES Cart(cart_id) ON DELETE CASCADE,
+            FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE
+        );
+        `);
 };

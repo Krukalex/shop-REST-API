@@ -1,10 +1,11 @@
 import { Router } from "express";
 import {
+  addToCartController,
   getProductController,
   getProductsController,
 } from "../controllers/shop-controller";
 import { isAuth } from "../middleware/isAuth";
-import { param } from "express-validator";
+import { param, body } from "express-validator";
 
 const shopRouter = Router();
 
@@ -15,6 +16,16 @@ shopRouter.get(
   [param("prodId").trim().notEmpty().withMessage("Product ID is required")],
   isAuth,
   getProductController
+);
+
+shopRouter.post(
+  "/add-to-cart",
+  [
+    body("productId").notEmpty().withMessage("Product ID is required"),
+    body("quantity").notEmpty().isNumeric().withMessage("quantity is required"),
+  ],
+  isAuth,
+  addToCartController
 );
 
 export default shopRouter;
