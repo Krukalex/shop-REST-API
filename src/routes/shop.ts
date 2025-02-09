@@ -3,6 +3,7 @@ import {
   addToCartController,
   createOrderController,
   getCartController,
+  getOrdersController,
   getProductController,
   getProductsController,
   removeFromCartController,
@@ -22,6 +23,8 @@ shopRouter.get(
 );
 
 shopRouter.get("/get-cart", isAuth, getCartController);
+
+shopRouter.get("/get-orders", isAuth, getOrdersController);
 
 shopRouter.post(
   "/add-to-cart",

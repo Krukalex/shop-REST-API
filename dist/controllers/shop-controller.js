@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createOrderController = exports.removeFromCartController = exports.addToCartController = exports.getCartController = exports.getProductsController = exports.getProductController = void 0;
+exports.createOrderController = exports.removeFromCartController = exports.addToCartController = exports.getOrdersController = exports.getCartController = exports.getProductsController = exports.getProductController = void 0;
 const express_validator_1 = require("express-validator");
 const Product_1 = __importDefault(require("../models/Product"));
 const request_validation_error_1 = require("../errors/request-validation-error");
@@ -70,6 +70,25 @@ const getCartController = (req, res, next) => {
     }
 };
 exports.getCartController = getCartController;
+const getOrdersController = (req, res, next) => {
+    const userId = req.userId;
+    try {
+        const user = User_1.default.getById(userId);
+        if (!user) {
+            throw new not_found_error_1.NotFoundError();
+        }
+        const orders = user === null || user === void 0 ? void 0 : user.getOrder();
+        res.status(200).json({ messge: "Retrieved orders", orders: orders });
+    }
+    catch (err) {
+        console.log(err);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+exports.getOrdersController = getOrdersController;
 const addToCartController = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {

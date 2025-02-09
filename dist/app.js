@@ -17,4 +17,6 @@ app.use(shop_1.default);
 app.use("/admin", admin_1.default);
 app.use("/auth", auth_1.default);
 app.use(error_handler_1.errorHandler);
-app.listen(3000);
+app.listen(3000, () => {
+    console.log("Listening on 3000");
+});

@@ -75,6 +75,29 @@ export const getCartController = (
   }
 };
 
+export const getOrdersController = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.userId!;
+
+  try {
+    const user = User.getById(userId);
+    if (!user) {
+      throw new NotFoundError();
+    }
+    const orders = user?.getOrder();
+    res.status(200).json({ messge: "Retrieved orders", orders: orders });
+  } catch (err: any) {
+    console.log(err);
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
 export const addToCartController = (
   req: Request,
   res: Response,
