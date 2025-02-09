@@ -108,6 +108,66 @@ class User {
         }
         return true;
     }
+    getOrder() {
+        const findStatement = db_1.db.prepare(`
+      SELECT
+        *
+      FROM 
+        OrderItems oi
+        LEFT OUTER JOIN Orders o on oi.order_id = o.order_id
+      WHERE
+        o.user_id = ?
+    `);
+        const orderItems = findStatement.all(this.user_id);
+        return orderItems;
+    }
+    createOrder() {
+        const findCartIdStmt = db_1.db.prepare(`
+        SELECT cart_id FROM Cart WHERE user_id = ?
+      `);
+        const existingCart = findCartIdStmt.get(this.user_id);
+        if (!existingCart) {
+            return false;
+        }
+        const { cart_id } = existingCart;
+        const transaction = db_1.db.transaction(() => {
+            // Step 3: Insert a new order
+            const createOrderStmt = db_1.db.prepare(`
+        INSERT INTO Orders (user_id, created_at, updated_at)
+        VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `);
+            createOrderStmt.run(this.user_id);
+            // Step 4: Retrieve the most recent order_id for this user
+            const orderIdStmt = db_1.db.prepare(`
+        SELECT order_id FROM Orders WHERE user_id = ? 
+        ORDER BY created_at DESC LIMIT 1
+      `);
+            const orderRecord = orderIdStmt.get(this.user_id);
+            if (!orderRecord) {
+                throw new Error("Order creation failed."); // Stop if order creation fails
+            }
+            const { order_id } = orderRecord;
+            // Step 5: Copy cart items to order items (Ensure timestamps are recorded)
+            const insertOrderItemsStmt = db_1.db.prepare(`
+        INSERT INTO OrderItems (order_id, product_id, quantity, price, created_at, updated_at)
+        SELECT ?, product_id, quantity, price, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        FROM CartItems WHERE cart_id = ?
+      `);
+            insertOrderItemsStmt.run(order_id, cart_id);
+            // Step 6: Delete cart items (cleanup)
+            const deleteCartItemsStmt = db_1.db.prepare(`
+        DELETE FROM CartItems WHERE cart_id = ?
+      `);
+            deleteCartItemsStmt.run(cart_id);
+            // Step 7: Delete cart (cleanup)
+            const deleteFromCartStmt = db_1.db.prepare(`
+        DELETE FROM Cart WHERE cart_id = ?
+      `);
+            deleteFromCartStmt.run(cart_id);
+        });
+        transaction();
+        return true;
+    }
     static getByEmail(email) {
         const findStatement = db_1.db.prepare("SELECT * FROM Users WHERE email = ?");
         const existingUser = findStatement.get(email);

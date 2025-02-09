@@ -143,3 +143,27 @@ export const removeFromCartController = (
     next(err);
   }
 };
+
+export const createOrderController = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.userId!;
+  try {
+    const user = User.getById(userId);
+    if (!user) {
+      throw new NotFoundError();
+    }
+    user.createOrder();
+    const order = user.getOrder();
+    res
+      .status(200)
+      .json({ message: "Order created successfully", order: order });
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeFromCartController = exports.addToCartController = exports.getCartController = exports.getProductsController = exports.getProductController = void 0;
+exports.createOrderController = exports.removeFromCartController = exports.addToCartController = exports.getCartController = exports.getProductsController = exports.getProductController = void 0;
 const express_validator_1 = require("express-validator");
 const Product_1 = __importDefault(require("../models/Product"));
 const request_validation_error_1 = require("../errors/request-validation-error");
@@ -132,3 +132,24 @@ const removeFromCartController = (req, res, next) => {
     }
 };
 exports.removeFromCartController = removeFromCartController;
+const createOrderController = (req, res, next) => {
+    const userId = req.userId;
+    try {
+        const user = User_1.default.getById(userId);
+        if (!user) {
+            throw new not_found_error_1.NotFoundError();
+        }
+        user.createOrder();
+        const order = user.getOrder();
+        res
+            .status(200)
+            .json({ message: "Order created successfully", order: order });
+    }
+    catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+exports.createOrderController = createOrderController;

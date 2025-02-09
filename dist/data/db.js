@@ -51,5 +51,27 @@ const create_db = () => {
             FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE
         );
         `);
+    exports.db.exec(`
+        CREATE TABLE IF NOT EXISTS Orders (
+            order_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+        );
+`);
+    exports.db.exec(`
+        CREATE TABLE IF NOT EXISTS OrderItems (
+            order_item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id INTEGER NOT NULL,
+            product_id TEXT NOT NULL,
+            quantity INTEGER NOT NULL CHECK (quantity > 0),
+            price INTEGER NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
+            FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE
+        );
+`);
 };
 exports.create_db = create_db;
