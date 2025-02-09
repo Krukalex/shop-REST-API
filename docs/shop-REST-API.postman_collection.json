@@ -1,0 +1,328 @@
+{
+	"info": {
+		"_postman_id": "92c199a2-f59d-47bd-8722-95b6e47fe912",
+		"name": "shop-REST-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26464116"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Alex\",\r\n    \"email\": \"test@example.com\",\r\n    \"password\": \"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "products",
+			"item": [
+				{
+					"name": "getProducts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ1c2VySWQiOiJjM2QzMDdhMy03Nzc5LTQzNWMtOWNhNy03MTA4M2M4NmE2YzEiLCJpYXQiOjE3Mzg0MzkzNjksImV4cCI6MTczODQ0Mjk2OX0.adJWHaf9peFBRmo3BkPWIo38bf5ghE5fxuVeEUOdSf8",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createProduct",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ1c2VySWQiOiJlMmNiMWViNi04ZDkxLTQ1ZWItYWUwMy1mM2ZmMGVlMGQ4M2UiLCJpYXQiOjE3MzkwMzM2MTQsImV4cCI6MTczOTAzNzIxNH0.Kjzgdfgla9BrW_LF6Y1GlvECFmmeH7uQtSqtz63dL7E",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"green book\",\r\n    \"description\": \"super cool green book\",\r\n    \"price\": 29.99\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/admin/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"admin",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProduct",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ1c2VySWQiOiJjM2QzMDdhMy03Nzc5LTQzNWMtOWNhNy03MTA4M2M4NmE2YzEiLCJpYXQiOjE3Mzg0MzkzNjksImV4cCI6MTczODQ0Mjk2OX0.adJWHaf9peFBRmo3BkPWIo38bf5ghE5fxuVeEUOdSf8",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/products/f799dc22-c6b4-4e56-ba82-0f6dfdd77c32",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"products",
+								"f799dc22-c6b4-4e56-ba82-0f6dfdd77c32"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateProduct",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ1c2VySWQiOiJlMmNiMWViNi04ZDkxLTQ1ZWItYWUwMy1mM2ZmMGVlMGQ4M2UiLCJpYXQiOjE3Mzg1NDAxMzcsImV4cCI6MTczODU0MzczN30.ESDddgJnh5FA3GNpqGo1k0k-EpxyzL2IN02eqj4HaHY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"really big blue book\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/admin/products/a4ba2a07-6f01-4819-9ea6-529876df763b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"admin",
+								"products",
+								"a4ba2a07-6f01-4819-9ea6-529876df763b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteProduct",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ1c2VySWQiOiJlMmNiMWViNi04ZDkxLTQ1ZWItYWUwMy1mM2ZmMGVlMGQ4M2UiLCJpYXQiOjE3Mzg1NDAxMzcsImV4cCI6MTczODU0MzczN30.ESDddgJnh5FA3GNpqGo1k0k-EpxyzL2IN02eqj4HaHY",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/admin/products/a4ba2a07-6f01-4819-9ea6-529876df763b",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"admin",
+								"products",
+								"a4ba2a07-6f01-4819-9ea6-529876df763b"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserProducts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/admin/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"admin",
+								"products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "cart",
+			"item": [
+				{
+					"name": "addToCart",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/add-to-cart",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"add-to-cart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCart",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "removeFromCart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ1c2VySWQiOiIwMDJjZWY5OS00N2RlLTQ1ZjMtOGY4Yy05OGJiMjQxZDdlNTEiLCJpYXQiOjE3MzkwNTM2NDgsImV4cCI6MTczOTA1NzI0OH0.Ky7a0NZgL0xOEiimCrVKOEq8ksVPX7dYjZdvZ20vLic",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/remove-from-cart",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"remove-from-cart"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "orders",
+			"item": [
+				{
+					"name": "createOrder",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ1c2VySWQiOiIwMDJjZWY5OS00N2RlLTQ1ZjMtOGY4Yy05OGJiMjQxZDdlNTEiLCJpYXQiOjE3MzkwNjUwMDgsImV4cCI6MTczOTA2ODYwOH0.1fcpd9faOPQBbjjcsOai89U8l9wbWC41VxwMXN7YA28",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/create-order",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"create-order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getOrders",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -46,6 +46,36 @@ The project follows the **Model-View-Controller (MVC)** design pattern. It is di
 
 ---
 
+## **Getting Started with the API**
+
+To start using the API, the first step is to **sign up for an account**. You can do this by making a `POST` request to the `/auth/signup` route with the following details:
+
+```json
+{
+  "name": "Your Name",
+  "email": "your-email@example.com",
+  "password": "your-secure-password"
+}
+```
+
+After signing up, you must **log in** using the `/auth/login` route with the email and password you provided. This will return an authentication token, which will be required to access protected routes.
+
+---
+
+## **API Documentation**
+
+All API routes are documented in the `/docs` folder of this project, and there is also an attached **Postman collection** provided. To explore the API using Postman:
+
+1. Open **Postman**.
+2. Click **Import** and select `docs/postman_collection.json`.
+3. After logging in, **copy the token** from the login response.
+4. Go to the **Authorization tab** in Postman and set the type to **Bearer Token**.
+5. Paste the token into the Authorization header for **each authenticated request**.
+
+⚠ **Note:** If the token is missing, requests to protected routes will return an **authentication error**.
+
+---
+
 ## **Running with Docker** 🐳
 
 This project can also be run using **Docker**.
